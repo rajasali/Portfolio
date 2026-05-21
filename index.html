@@ -1451,19 +1451,26 @@
 
       <div class="contact-form-area reveal">
         <h3>Send a Message</h3>
-        <div class="form-group">
-          <label class="form-label">Your Name</label>
-          <input type="text" class="form-input" placeholder="Jane Smith">
+        <div id="form-container">
+          <div class="form-group">
+            <label class="form-label">Your Name</label>
+            <input type="text" id="form-name" class="form-input" placeholder="Jane Smith">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email Address</label>
+            <input type="email" id="form-email" class="form-input" placeholder="jane@example.com">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Message</label>
+            <textarea id="form-message" class="form-input" placeholder="I'd like to discuss..."></textarea>
+          </div>
+          <button class="btn-primary" id="form-btn" onclick="submitForm()">Send Message</button>
         </div>
-        <div class="form-group">
-          <label class="form-label">Email Address</label>
-          <input type="email" class="form-input" placeholder="jane@example.com">
+        <div id="form-success" style="display:none;text-align:center;padding:40px 0;">
+          <div style="font-size:48px;margin-bottom:16px;">✓</div>
+          <div style="font-family:var(--font-display);font-size:22px;font-weight:700;color:var(--ms-dark);margin-bottom:8px;">Message Sent!</div>
+          <div style="font-size:14px;color:var(--ms-grey);">Thanks for reaching out. I'll get back to you shortly.</div>
         </div>
-        <div class="form-group">
-          <label class="form-label">Message</label>
-          <textarea class="form-input" placeholder="I'd like to discuss..."></textarea>
-        </div>
-        <button class="btn-primary" onclick="alert('Message sent! Rajas will be in touch shortly.')">Send Message</button>
       </div>
     </div>
   </div>
@@ -1480,6 +1487,43 @@
 </footer>
 
 <script>
+  // Formspree contact form
+  async function submitForm() {
+    const name = document.getElementById('form-name').value.trim();
+    const email = document.getElementById('form-email').value.trim();
+    const message = document.getElementById('form-message').value.trim();
+    const btn = document.getElementById('form-btn');
+
+    if (!name || !email || !message) {
+      alert('Please fill in all fields.');
+      return;
+    }
+
+    btn.textContent = 'Sending...';
+    btn.disabled = true;
+
+    try {
+      const res = await fetch('https://formspree.io/f/mdajgove', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({ name, email, message })
+      });
+
+      if (res.ok) {
+        document.getElementById('form-container').style.display = 'none';
+        document.getElementById('form-success').style.display = 'block';
+      } else {
+        alert('Something went wrong. Please try again.');
+        btn.textContent = 'Send Message';
+        btn.disabled = false;
+      }
+    } catch (err) {
+      alert('Something went wrong. Please try again.');
+      btn.textContent = 'Send Message';
+      btn.disabled = false;
+    }
+  }
+
   // Scroll reveal
   const revealEls = document.querySelectorAll('.reveal');
   const observer = new IntersectionObserver((entries) => {
